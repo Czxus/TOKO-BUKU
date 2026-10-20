@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Support\Tenancy\TenantContext;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +12,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Scoped: 1 instance per request/job; direset di lifecycle berikutnya
+        $this->app->scoped(
+            TenantContext::class,
+            fn (): TenantContext => new TenantContext,
+        );
     }
 
     /**
