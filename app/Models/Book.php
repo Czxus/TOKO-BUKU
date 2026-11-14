@@ -28,6 +28,11 @@ class Book extends Model
         'is_active',
     ];
 
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
     protected static function booted()
     {
         parent::booted();

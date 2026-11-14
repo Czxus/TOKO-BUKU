@@ -2,8 +2,13 @@
 
 use App\Http\Controllers\BookController; // Sesuaikan jika ada controller buku
 use Illuminate\Support\Facades\Route;
+use Livewire\Volt\Volt;
 
-Route::redirect('/', '/login');
+Route::view('/', 'welcome');
+
+// Katalog publik (FR-CUS-01): lintas toko dan per toko
+Volt::route('katalog', 'pages.catalog.index')->name('katalog');
+Volt::route('store/{slug}', 'pages.catalog.index')->name('toko.katalog');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
