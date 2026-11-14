@@ -3,7 +3,7 @@
 use App\Http\Controllers\BookController; // Sesuaikan jika ada controller buku
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::redirect('/', '/login');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

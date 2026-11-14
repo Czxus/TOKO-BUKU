@@ -37,52 +37,45 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <form wire:submit="register">
-        <!-- Name -->
+    <div class="mb-8 space-y-2">
+        <h2 class="font-serif text-3xl font-semibold">Daftar sebagai pembeli</h2>
+        <p class="text-sm text-gray-600">Buat akun untuk mencari, menyimpan, dan membeli buku dari banyak toko.</p>
+    </div>
+
+    <form wire:submit="register" class="space-y-5">
+        <!-- Nama -->
         <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
+            <x-input-label for="name" value="Nama lengkap" />
+            <x-text-input wire:model="name" id="name" class="block mt-1 w-full" type="text" name="name" placeholder="Nama Anda" required autofocus autocomplete="name" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
+        <!-- Email -->
+        <div>
+            <x-input-label for="email" value="Email" />
+            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" placeholder="nama@email.com" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
+        <!-- Kata sandi -->
+        <div>
+            <x-input-label for="password" value="Kata sandi" />
+            <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password" name="password" placeholder="Minimal 8 karakter" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
+        <!-- Konfirmasi -->
+        <div>
+            <x-input-label for="password_confirmation" value="Ulangi kata sandi" />
+            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" placeholder="Ketik ulang kata sandi" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full">Daftar</x-primary-button>
     </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+        Sudah punya akun?
+        <a href="{{ route('login') }}" wire:navigate class="font-semibold text-hijau hover:underline">Masuk</a>
+    </p>
 </div>

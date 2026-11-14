@@ -25,47 +25,46 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="mb-8 space-y-2">
+        <h2 class="font-serif text-3xl font-semibold">Masuk ke akun Anda</h2>
+        <p class="text-sm text-gray-600">Pembeli, penjual, dan admin platform masuk dari halaman yang sama.</p>
+    </div>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form wire:submit="login">
-        <!-- Email Address -->
+    <form wire:submit="login" class="space-y-5">
+        <!-- Email -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
+            <x-input-label for="email" value="Email" />
+            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" placeholder="nama@email.com" required autofocus autocomplete="username" />
             <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
+        <!-- Kata sandi -->
+        <div>
+            <div class="flex items-baseline justify-between">
+                <x-input-label for="password" value="Kata sandi" />
+                @if (Route::has('password.request'))
+                    <a class="text-sm font-medium text-hijau hover:underline" href="{{ route('password.request') }}" wire:navigate>Lupa kata sandi?</a>
+                @endif
+            </div>
+            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full" type="password" name="password" placeholder="Masukkan kata sandi" required autocomplete="current-password" />
             <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+        <!-- Ingat saya -->
+        <label for="remember" class="inline-flex items-center gap-2">
+            <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-[#A9B5B2] text-hijau focus:ring-hijau" name="remember">
+            <span class="text-sm">Ingat saya di perangkat ini</span>
+        </label>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        <x-primary-button class="w-full">Masuk</x-primary-button>
     </form>
+
+    <p class="mt-6 text-center text-sm text-gray-600">
+        Belum punya akun?
+        <a href="{{ route('register') }}" wire:navigate class="font-semibold text-hijau hover:underline">Daftar sebagai pembeli</a>
+    </p>
+    <p class="mt-3 text-center text-xs text-gray-500">Ingin berjualan? Hubungi admin platform untuk pendaftaran toko mitra.</p>
 </div>
