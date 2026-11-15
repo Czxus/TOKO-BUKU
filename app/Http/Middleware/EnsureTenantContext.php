@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureTenantContext
 {
+<<<<<<< HEAD
     public function handle(Request $request, Closure $next): Response
     {
         $param = $request->route('tenant');
@@ -46,4 +47,33 @@ class EnsureTenantContext
             $context->clear();
         }
     }
+=======
+   public function handle(Request $request, Closure $next): Response
+{
+    $tenantParam = $request->route('tenant');
+
+    $tenant = $tenantParam instanceof Tenant
+        ? $tenantParam
+        : Tenant::where('domain_slug', (string) $tenantParam)->firstOrFail();
+
+    if (! $tenant->isActive()) {
+        abort(403, 'Toko buku ini sedang tidak aktif.');
+    }
+
+    // Seller hanya boleh membuka tokonya sendiri (FR-TEN-01)
+    $user = $request->user();
+    if ($user->role !== 'admin_platform' && $user->tenant_id !== $tenant->id) {
+        abort(403, 'Anda tidak memiliki akses ke toko ini.');
+    }
+
+    $tenantContext = app(TenantContext::class);
+    $tenantContext->set($tenant);
+
+    try {
+        return $next($request);
+    } finally {
+        $tenantContext->clear();
+    }
+}
+>>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
 }

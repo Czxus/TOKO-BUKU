@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+<<<<<<< HEAD
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
+=======
+>>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
 
 class Book extends Model
 {
@@ -20,26 +23,52 @@ class Book extends Model
     // tenant_id TIDAK mass-assignable: diisi otomatis dari TenantContext (BelongsToTenant).
     // foto_sampul diisi eksplisit oleh CoverStore, bukan dari input.
     protected $fillable = [
+<<<<<<< HEAD
         'category_id', 'judul', 'penulis', 'penerbit', 'isbn', 'tahun_terbit',
         'format_buku', 'harga', 'stok', 'berat_gram', 'deskripsi', 'is_active',
+=======
+        'tenant_id',
+        'category_id',
+        'judul',
+        'penulis',
+        'penerbit',
+        'isbn',
+        'tahun_terbit',
+        'format_buku',
+        'harga',
+        'stok',
+        'berat_gram',
+        'deskripsi',
+        'foto_sampul',
+        'file_preview_pdf',
+        'file_ebook_full',
+        'is_active',
+>>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
     ];
 
     protected function casts(): array
     {
         return [
+<<<<<<< HEAD
             'tahun_terbit' => 'integer',
             'harga' => 'integer',
             'stok' => 'integer',
             'berat_gram' => 'integer',
+=======
+>>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
             'is_active' => 'boolean',
         ];
     }
 
+<<<<<<< HEAD
     /** @return BelongsTo<Category, $this> */
+=======
+>>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
+<<<<<<< HEAD
 
     /** Buku fisik yang stoknya 0 dianggap habis. E-book tidak memakai stok. */
     public function isOutOfStock(): bool
@@ -64,4 +93,6 @@ class Book extends Model
     {
         return $this->foto_sampul !== null ? Storage::disk('public')->url($this->foto_sampul) : null;
     }
+=======
+>>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
 }
