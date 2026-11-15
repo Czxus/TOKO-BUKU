@@ -19,15 +19,8 @@ class TenantIsolationTest extends TestCase
         $tenantA = Tenant::factory()->create(['status' => 'active']);
         $tenantB = Tenant::factory()->create(['status' => 'active']);
 
-        $categoryA = Category::create([
-            'nama_kategori' => 'Kategori A',
-            'tenant_id'     => $tenantA->id,
-        ]);
-
-        $categoryB = Category::create([
-            'nama_kategori' => 'Kategori B',
-            'tenant_id'     => $tenantB->id,
-        ]);
+        $categoryA = Category::create(['nama_kategori' => 'Kategori A']);
+        $categoryB = Category::create(['nama_kategori' => 'Kategori B']);
 
         Book::factory()->count(2)->create([
             'tenant_id'   => $tenantA->id,
@@ -62,8 +55,15 @@ class TenantIsolationTest extends TestCase
         $tenantA = Tenant::factory()->create();
         app(TenantContext::class)->set($tenantA);
 
+        $category = Category::factory()->create();
+
         $book = Book::create([
-            'judul' => 'Buku Laravel Multi-Tenant',
+            'category_id' => $category->id,
+            'judul'       => 'Buku Laravel Multi-Tenant',
+            'penulis'     => 'Penulis Contoh',
+            'penerbit'    => 'Penerbit Contoh',
+            'isbn'        => '9786020000099',
+            'harga'       => 50000,
         ]);
 
         $this->assertSame($tenantA->id, $book->tenant_id);
@@ -74,13 +74,10 @@ class TenantIsolationTest extends TestCase
         $tenantA = Tenant::factory()->create(['domain_slug' => 'toko-a']);
         $tenantB = Tenant::factory()->create(['domain_slug' => 'toko-b']);
 
-        $categoryB = Category::create([
-            'nama_kategori' => 'Kategori Toko B',
-            'tenant_id'     => $tenantB->id,
-        ]);
+        $categoryB = Category::create(['nama_kategori' => 'Kategori Toko B']);
 
         $userA = User::factory()->create();
-        
+
         $bookB = Book::factory()->create([
             'tenant_id'   => $tenantB->id,
             'category_id' => $categoryB->id,
