@@ -16,28 +16,12 @@ class TenantIsolationTest extends TestCase
 
     public function test_global_scope_returns_only_active_tenant_books(): void
     {
-        $tenantA = Tenant::factory()->create(['status' => 'active']);
-        $tenantB = Tenant::factory()->create(['status' => 'active']);
+        $tenantA = Tenant::factory()->create();
+        $tenantB = Tenant::factory()->create();
+        $category = Category::factory()->create(); // kategori milik platform
 
-        $categoryA = Category::create([
-            'nama_kategori' => 'Kategori A',
-            'tenant_id'     => $tenantA->id,
-        ]);
-
-        $categoryB = Category::create([
-            'nama_kategori' => 'Kategori B',
-            'tenant_id'     => $tenantB->id,
-        ]);
-
-        Book::factory()->count(2)->create([
-            'tenant_id'   => $tenantA->id,
-            'category_id' => $categoryA->id,
-        ]);
-
-        Book::factory()->count(3)->create([
-            'tenant_id'   => $tenantB->id,
-            'category_id' => $categoryB->id,
-        ]);
+        Book::factory()->count(2)->create(['tenant_id' => $tenantA->id, 'category_id' => $category->id]);
+        Book::factory()->count(3)->create(['tenant_id' => $tenantB->id, 'category_id' => $category->id]);
 
         app(TenantContext::class)->set($tenantA);
 
@@ -47,9 +31,7 @@ class TenantIsolationTest extends TestCase
 
     public function test_context_is_reset_between_requests(): void
     {
-        $tenantA = Tenant::factory()->create();
-        app(TenantContext::class)->set($tenantA);
-
+        app(TenantContext::class)->set(Tenant::factory()->create());
         $this->assertTrue(app(TenantContext::class)->has());
 
         $this->app->forgetScopedInstances();
@@ -60,36 +42,49 @@ class TenantIsolationTest extends TestCase
     public function test_tenant_id_is_autofilled_on_book_creation(): void
     {
         $tenantA = Tenant::factory()->create();
+        $category = Category::factory()->create();
         app(TenantContext::class)->set($tenantA);
 
         $book = Book::create([
+            'category_id' => $category->id,
             'judul' => 'Buku Laravel Multi-Tenant',
+            'penulis' => 'Penulis Uji',
+            'penerbit' => 'Penerbit Uji',
+            'isbn' => '9786020000999',
+            'format_buku' => 'fisik',
+            'harga' => 50000,
+            'stok' => 10,
+            'berat_gram' => 300,
         ]);
 
         $this->assertSame($tenantA->id, $book->tenant_id);
     }
 
-    public function test_scoped_binding_blocks_cross_tenant_access(): void
+    public function test_tenant_id_cannot_be_mass_assigned(): void
     {
-        $tenantA = Tenant::factory()->create(['domain_slug' => 'toko-a']);
-        $tenantB = Tenant::factory()->create(['domain_slug' => 'toko-b']);
+        $tenantA = Tenant::factory()->create();
+        $tenantB = Tenant::factory()->create();
+        $category = Category::factory()->create();
+        app(TenantContext::class)->set($tenantA);
 
-        $categoryB = Category::create([
-            'nama_kategori' => 'Kategori Toko B',
-            'tenant_id'     => $tenantB->id,
+        $book = Book::create([
+            'tenant_id' => $tenantB->id, // harus diabaikan
+            'category_id' => $category->id,
+            'judul' => 'Coba Bobol', 'penulis' => 'X', 'penerbit' => 'Y', 'isbn' => '9786020000888',
+            'format_buku' => 'fisik', 'harga' => 1000, 'stok' => 1, 'berat_gram' => 100,
         ]);
 
-        $userA = User::factory()->create();
-        
-        $bookB = Book::factory()->create([
-            'tenant_id'   => $tenantB->id,
-            'category_id' => $categoryB->id,
-        ]);
+        $this->assertSame($tenantA->id, $book->tenant_id);
+    }
 
-        $this->actingAs($userA);
+    public function test_seller_cannot_open_another_tenants_portal(): void
+    {
+        $tenantA = Tenant::factory()->create();
+        $tenantB = Tenant::factory()->create();
+        $sellerA = User::factory()->create(['role' => 'seller_admin', 'tenant_id' => $tenantA->id]);
 
-        $response = $this->getJson("/tenant/toko-a/books/{$bookB->id}");
-
-        $response->assertNotFound();
+        $this->actingAs($sellerA)
+            ->get(route('tenant.books', $tenantB->domain_slug))
+            ->assertForbidden();
     }
 }

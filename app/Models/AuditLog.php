@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditLog extends Model
 {
+    // Sesuai kolom tabel audit_logs (migrasi 000105). Tidak ada canteen_id / request_id.
     protected $fillable = [
-        'actor_id', 'canteen_id', 'tenant_id', 'entity', 'entity_id',
-        'action', 'request_id', 'before', 'after', 'metadata', 'logged_at',
+        'actor_id', 'tenant_id', 'entity', 'entity_id',
+        'action', 'before', 'after', 'metadata', 'logged_at',
     ];
 
     protected function casts(): array

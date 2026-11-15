@@ -11,14 +11,13 @@ class TenantScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        $tenantContext = app(TenantContext::class);
-
-        // Hanya terapkan filter jika TenantContext sudah diisi
-        if ($tenantContext->has()) {
-            $builder->where(
-                $model->qualifyColumn('tenant_id'),
-                $tenantContext->id(),
-            );
+        if (app()->bound(TenantContext::class)) {
+            // Ubah dari ->get() menjadi ->tenant() atau gunakan idOrNull()
+            $tenantId = app(TenantContext::class)->idOrNull();
+            
+            if ($tenantId !== null) {
+                $builder->where($model->getTable() . '.tenant_id', $tenantId);
+            }
         }
     }
 }

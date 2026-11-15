@@ -12,33 +12,38 @@ class EnsureTenantContext
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $tenantContext = app(TenantContext::class);
+        $param = $request->route('tenant');
 
-        // (1) Cari tenant dari parameter route / slug
-        $tenantParam = $request->route('tenant');
-
-        if ($tenantParam instanceof Tenant) {
-            $tenant = $tenantParam;
-        } elseif (is_string($tenantParam)) {
-            $tenant = Tenant::where('slug', $tenantParam)->firstOrFail();
+        // (1) Cari tenant dari parameter route (model hasil binding, atau string domain_slug)
+        if ($param instanceof Tenant) {
+            $tenant = $param;
+        } elseif (is_string($param)) {
+            $tenant = Tenant::where('domain_slug', $param)->first();
         } else {
-            abort(404, 'Tenant tidak ditemukan.');
+            $tenant = null;
         }
 
-        // (2) Verifikasi status tenant aktif (opsional jika kolom is_active tersedia)
-        if (isset($tenant->is_active) && ! $tenant->is_active) {
-            abort(403, 'Toko buku ini sedang tidak aktif.');
-        }
+        abort_if($tenant === null, 404, 'Tenant tidak ditemukan.');
 
-        // (3) Isi TenantContext
-        $tenantContext->set($tenant);
+        // (2) Toko harus aktif
+        abort_unless($tenant->isActive(), 403, 'Toko buku ini sedang tidak aktif.');
+
+        // (3) User harus seller dari toko ini (mencegah seller A membuka toko B)
+        $user = $request->user();
+        abort_unless(
+            $user !== null && $user->isSellerAdmin() && (int) $user->tenant_id === $tenant->id,
+            403,
+            'Anda tidak memiliki akses ke toko ini.'
+        );
+
+        // (4) Isi TenantContext, lalu pastikan dikosongkan setelah request selesai
+        $context = app(TenantContext::class);
+        $context->set($tenant);
 
         try {
-            // Lanjutkan request
             return $next($request);
         } finally {
-            // (4) Kosongkan/reset context di blok finally agar tidak bocor ke request berikutnya
-            $tenantContext->clear();
+            $context->clear();
         }
     }
 }

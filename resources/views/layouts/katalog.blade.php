@@ -23,6 +23,9 @@
 
                 <nav class="flex items-center gap-2 text-sm font-medium">
                     @auth
+                        @if (auth()->user()->isPembeli())
+                            <livewire:cart.badge />
+                        @endif
                         <a href="{{ route('dashboard') }}" wire:navigate class="rounded-lg px-4 h-10 inline-flex items-center bg-amber-buku text-tinta font-semibold hover:opacity-90">Dasbor</a>
                     @else
                         <a href="{{ route('login') }}" wire:navigate class="rounded-lg px-3 h-10 inline-flex items-center hover:bg-hijau-tua">Masuk</a>
