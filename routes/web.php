@@ -10,6 +10,11 @@ Route::redirect('/', '/login');
 Volt::route('katalog', 'pages.catalog.index')->name('katalog');
 Volt::route('store/{slug}', 'pages.catalog.index')->name('toko.katalog');
 
+// Keranjang pembeli (Modul 8): disimpan di Redis, harga/stok direvalidasi dari database
+Volt::route('keranjang', 'pages.cart.index')
+    ->middleware('auth')
+    ->name('keranjang');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -22,7 +27,7 @@ require __DIR__.'/auth.php';
 
 // === TAMBAHAN UNTUK MODUL 4: RUTE TENANT DENGAN SCOPED BINDING ===
 Route::middleware(['auth', 'tenant.context'])->group(function () {
-    Route::prefix('tenant/{tenant:slug}')->scopeBindings()->group(function () {
+    Route::prefix('tenant/{tenant:domain_slug}')->scopeBindings()->group(function () {
         // Contoh rute dashboard tenant
         Route::get('/dashboard', function ($tenant) {
             return "Selamat datang di Toko Buku: " . $tenant;

@@ -34,7 +34,7 @@ use Livewire\Volt\Component;
         $menu = [
             ['Beranda', route('dashboard'), 'M3 11 12 3l9 8v10H3z'],
             ['Katalog Buku', route('katalog'), 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5'],
-            ['Keranjang', '#', 'M6 6h15l-1.5 9h-12zM6 6 5 3H2M9 20m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0M18 20m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0'],
+            ['Keranjang', route('keranjang'), 'M6 6h15l-1.5 9h-12zM6 6 5 3H2M9 20m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0M18 20m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0'],
             ['Pesanan Saya', '#', 'M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8'],
         ];
     }

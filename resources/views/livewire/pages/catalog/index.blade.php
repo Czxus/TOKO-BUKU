@@ -1,8 +1,9 @@
 <?php
 
-use App\Models\Cart;
 use App\Models\Category;
 use App\Models\Tenant;
+use App\Modules\Ordering\Exceptions\CartException;
+use App\Modules\Ordering\Services\CartService;
 use App\Services\PublicCatalogQuery;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -70,47 +71,17 @@ new #[Layout('layouts.katalog')] class extends Component
             return;
         }
 
-        $book = app(PublicCatalogQuery::class)->findPublic($bookId);
-
-        if (! $book) {
-            $this->notif('Buku ini sudah tidak tersedia.', 'err');
-
-            return;
-        }
-
-        $maks = match ($book->format_buku) {
-            'fisik' => (int) $book->stok,
-            'ebook' => 1,
-            default => max(1, (int) $book->stok),
-        };
-
-        if ($maks < 1) {
-            $this->notif('Stok buku ini habis.', 'err');
+        // Keranjang disimpan di Redis oleh CartService (Modul 8). Service memvalidasi buku
+        // aktif, toko aktif, stok, dan batas jumlah dari database; katalog tidak menentukan harga.
+        try {
+            $book = app(CartService::class)->add($user, $bookId, 1);
+        } catch (CartException $e) {
+            $this->notif($e->getMessage(), 'err');
 
             return;
         }
 
-        $cart = Cart::where('user_id', $user->id)->where('book_id', $book->id)->first();
-        $jumlah = ($cart?->jumlah ?? 0) + 1;
-
-        if ($jumlah > $maks) {
-            $this->notif('Jumlah di keranjang sudah mencapai batas yang tersedia.', 'err');
-
-            return;
-        }
-
-        if ($cart) {
-            $cart->jumlah = $jumlah;
-            $cart->save();
-        } else {
-            $cart = new Cart;
-            $cart->user_id = $user->id;
-            $cart->tenant_id = $book->tenant_id;
-            $cart->book_id = $book->id;
-            $cart->jumlah = 1;
-            $cart->save();
-        }
-
+        $this->dispatch('cart-updated');
         $this->notif('“'.$book->judul.'” ditambahkan ke keranjang.', 'ok');
     }
 
