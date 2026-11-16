@@ -33,8 +33,7 @@ Route::middleware(['auth', 'tenant.context'])->group(function () {
             return "Selamat datang di Toko Buku: " . $tenant;
         })->name('tenant.dashboard');
 
-        // Contoh rute buku milik tenant (opsional jika memiliki BookController)
-        // Route::get('/books', [BookController::class, 'index'])->name('tenant.books.index');
-        // Route::get('/books/{book}', [BookController::class, 'show'])->name('tenant.books.show');
+        // Rute manajemen buku tenant
+        Volt::route('/books', 'pages.seller.books')->name('tenant.books');
     });
 });

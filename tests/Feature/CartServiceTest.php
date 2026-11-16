@@ -313,7 +313,6 @@ class CartServiceTest extends TestCase
             $this->assertSame(0, $this->cart()->itemCount($user));
         }
     }
-
     public function test_expired_cart_is_empty_not_an_exception(): void
     {
         $user = $this->pembeli();

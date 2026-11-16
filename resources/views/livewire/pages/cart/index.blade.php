@@ -1,9 +1,10 @@
 <?php
 
+use App\Models\User;
 use App\Modules\Ordering\Data\CartView;
 use App\Modules\Ordering\Exceptions\CartException;
 use App\Modules\Ordering\Services\CartService;
-use Closure;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -17,7 +18,17 @@ new #[Layout('layouts.katalog')] class extends Component
 {
     public function mount(): void
     {
-        abort_unless(auth()->user()?->isPembeli(), 403);
+        /** @var User|null $user */
+        $user = Auth::user();
+        abort_unless($user?->isPembeli(), 403);
+    }
+
+    private function currentUser(): User
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        return $user;
     }
 
     /** Null bila keranjang tidak dapat dibaca (Redis bermasalah); pesan galat diisi. */
@@ -25,7 +36,7 @@ new #[Layout('layouts.katalog')] class extends Component
     public function cart(): ?CartView
     {
         try {
-            return app(CartService::class)->view(auth()->user());
+            return app(CartService::class)->view($this->currentUser());
         } catch (CartException $e) {
             $this->addError('cart', $e->getMessage());
 
@@ -35,31 +46,31 @@ new #[Layout('layouts.katalog')] class extends Component
 
     public function increment(int $bookId): void
     {
-        $this->jalankan(fn (CartService $cart) => $cart->changeQuantity(auth()->user(), $bookId, 1));
+        $this->jalankan(fn (CartService $cart) => $cart->changeQuantity($this->currentUser(), $bookId, 1));
     }
 
     public function decrement(int $bookId): void
     {
-        $this->jalankan(fn (CartService $cart) => $cart->changeQuantity(auth()->user(), $bookId, -1));
+        $this->jalankan(fn (CartService $cart) => $cart->changeQuantity($this->currentUser(), $bookId, -1));
     }
 
     public function remove(int $bookId): void
     {
-        $this->jalankan(fn (CartService $cart) => $cart->remove(auth()->user(), $bookId));
+        $this->jalankan(fn (CartService $cart) => $cart->remove($this->currentUser(), $bookId));
     }
 
     public function clear(): void
     {
-        $this->jalankan(fn (CartService $cart) => $cart->clear(auth()->user()));
+        $this->jalankan(fn (CartService $cart) => $cart->clear($this->currentUser()));
     }
 
     /** Pembeli menyetujui harga terbaru dari database. */
     public function acceptPrices(): void
     {
-        $this->jalankan(fn (CartService $cart) => $cart->acceptPriceChanges(auth()->user()));
+        $this->jalankan(fn (CartService $cart) => $cart->acceptPriceChanges($this->currentUser()));
     }
 
-    private function jalankan(Closure $aksi): void
+    private function jalankan(\Closure $aksi): void
     {
         $this->resetErrorBag('cart');
 

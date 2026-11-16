@@ -18,12 +18,7 @@ class TenantIsolationTest extends TestCase
     {
         $tenantA = Tenant::factory()->create();
         $tenantB = Tenant::factory()->create();
-        $category = Category::factory()->create(); // kategori milik platform
 
-<<<<<<< HEAD
-        Book::factory()->count(2)->create(['tenant_id' => $tenantA->id, 'category_id' => $category->id]);
-        Book::factory()->count(3)->create(['tenant_id' => $tenantB->id, 'category_id' => $category->id]);
-=======
         $categoryA = Category::create(['nama_kategori' => 'Kategori A']);
         $categoryB = Category::create(['nama_kategori' => 'Kategori B']);
 
@@ -36,7 +31,6 @@ class TenantIsolationTest extends TestCase
             'tenant_id'   => $tenantB->id,
             'category_id' => $categoryB->id,
         ]);
->>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
 
         app(TenantContext::class)->set($tenantA);
 
@@ -60,26 +54,13 @@ class TenantIsolationTest extends TestCase
         $category = Category::factory()->create();
         app(TenantContext::class)->set($tenantA);
 
-        $category = Category::factory()->create();
-
         $book = Book::create([
             'category_id' => $category->id,
-<<<<<<< HEAD
-            'judul' => 'Buku Laravel Multi-Tenant',
-            'penulis' => 'Penulis Uji',
-            'penerbit' => 'Penerbit Uji',
-            'isbn' => '9786020000999',
-            'format_buku' => 'fisik',
-            'harga' => 50000,
-            'stok' => 10,
-            'berat_gram' => 300,
-=======
             'judul'       => 'Buku Laravel Multi-Tenant',
             'penulis'     => 'Penulis Contoh',
             'penerbit'    => 'Penerbit Contoh',
             'isbn'        => '9786020000099',
             'harga'       => 50000,
->>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
         ]);
 
         $this->assertSame($tenantA->id, $book->tenant_id);
@@ -92,26 +73,18 @@ class TenantIsolationTest extends TestCase
         $category = Category::factory()->create();
         app(TenantContext::class)->set($tenantA);
 
-<<<<<<< HEAD
         $book = Book::create([
-            'tenant_id' => $tenantB->id, // harus diabaikan
+            'tenant_id'   => $tenantB->id,
             'category_id' => $category->id,
-            'judul' => 'Coba Bobol', 'penulis' => 'X', 'penerbit' => 'Y', 'isbn' => '9786020000888',
-            'format_buku' => 'fisik', 'harga' => 1000, 'stok' => 1, 'berat_gram' => 100,
+            'judul'       => 'Buku Percobaan Mass Assignment',
+            'penulis'     => 'Penulis Contoh',
+            'penerbit'    => 'Penerbit Contoh',
+            'isbn'        => '9786020000105',
+            'harga'       => 60000,
         ]);
 
         $this->assertSame($tenantA->id, $book->tenant_id);
     }
-=======
-        $categoryB = Category::create(['nama_kategori' => 'Kategori Toko B']);
-
-        $userA = User::factory()->create();
-
-        $bookB = Book::factory()->create([
-            'tenant_id'   => $tenantB->id,
-            'category_id' => $categoryB->id,
-        ]);
->>>>>>> 71c104605f2a013ea8ee69d3eff2f98de517e881
 
     public function test_seller_cannot_open_another_tenants_portal(): void
     {

@@ -7,7 +7,6 @@ use App\Services\AuditLogger;
 use App\Services\BookStockService;
 use App\Services\CoverStore;
 use App\Support\Tenancy\TenantContext;
-use DomainException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -68,6 +67,7 @@ new #[Layout('components.dashboard-layout'), Title('Buku & Stok')] class extends
 
     private function guard(): void
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
         abort_unless(
             $user !== null && $user->isSellerAdmin() && (int) $user->tenant_id === $this->tenantId,
