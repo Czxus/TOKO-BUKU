@@ -55,6 +55,12 @@ class User extends Authenticatable
         return $this->belongsTo(Tenant::class);
     }
 
+    /** @return HasMany<ApiToken, $this> */
+    public function apiTokens(): HasMany
+    {
+        return $this->hasMany(ApiToken::class);
+    }
+
     /** @return HasMany<Cart, $this> */
     public function carts(): HasMany
     {
