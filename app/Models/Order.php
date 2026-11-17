@@ -2,31 +2,28 @@
 
 namespace App\Models;
 
-use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany; // <-- Tambahkan import ini
 
-/**
- * Pesanan induk — platform-scoped (TANPA tenant_id): satu checkout bisa lintas toko.
- */
 class Order extends Model
 {
-    /** @use HasFactory<OrderFactory> */
     use HasFactory;
 
-    // Nomor nota, status, dan total dihitung server (bukan dari input pelanggan).
-    protected $fillable = ['alamat_pengiriman', 'kecamatan', 'kode_pos'];
-
-    protected function casts(): array
-    {
-        return [
-            'biaya_layanan' => 'integer',
-            'total_tagihan' => 'integer',
-            'batas_pembayaran' => 'datetime',
-        ];
-    }
+    protected $fillable = [
+        'user_id',
+        'nomor_nota',
+        'checkout_key',
+        'alamat_pengiriman',
+        'kecamatan',
+        'kode_pos',
+        'biaya_layanan',
+        'total_tagihan',
+        'status_pembayaran',
+        'batas_pembayaran',
+    ];
 
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
@@ -34,15 +31,18 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    /** @return HasMany<SellerOrder, $this> */
+    /** @return HasOne<Payment, $this> */
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
+
+    /** 
+     * Relasi ke SellerOrder (Pesanan per Tenant/Toko)
+     * @return HasMany<SellerOrder, $this> 
+     */
     public function sellerOrders(): HasMany
     {
         return $this->hasMany(SellerOrder::class);
-    }
-
-    /** @return HasMany<Payment, $this> */
-    public function payments(): HasMany
-    {
-        return $this->hasMany(Payment::class);
     }
 }

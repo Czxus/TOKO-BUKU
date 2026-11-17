@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -103,9 +104,21 @@ class AuthController extends Controller
      * Info user yang sedang login.
      * GET /api/me
      */
-    public function me(Request $request): JsonResponse
+  public function me(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::guard()->user();
+
+        if (! $user) {
+            return response()->json([
+                'message' => 'Unauthorized.'
+            ], 401);
+        }
+        if (! $user) {
+            return response()->json([
+                'message' => 'Unauthorized.'
+            ], 401);
+        }
 
         return response()->json([
             'user' => [

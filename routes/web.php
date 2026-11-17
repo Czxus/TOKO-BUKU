@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\BookController; // Sesuaikan jika ada controller buku
+use App\Http\Controllers\BookController; 
+use App\Http\Controllers\PaymentController; // <-- TAMBAHKAN IMPORT INI DI BAGIAN ATAS
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -14,6 +15,12 @@ Volt::route('store/{slug}', 'pages.catalog.index')->name('toko.katalog');
 Volt::route('keranjang', 'pages.cart.index')
     ->middleware('auth')
     ->name('keranjang');
+
+// === TAMBAHAN RUTE PEMBAYARAN (MODUL 9) ===
+Route::middleware(['auth'])->group(function () {
+    Route::post('/payments/store', [PaymentController::class, 'store'])->name('payment.store');
+    Route::get('/payment/{payment}', [PaymentController::class, 'show'])->name('payment.show');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

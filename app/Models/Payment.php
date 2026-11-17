@@ -13,7 +13,18 @@ class Payment extends Model
     use HasFactory;
 
     // Status & referensi gateway hanya diubah oleh alur verifikasi webhook (Modul 11).
-    protected $fillable = ['payment_method', 'jumlah_bayar'];
+   protected $fillable = [
+    'order_id',
+    'confirmed_by',
+    'payment_method',
+    'payment_reference',
+    'idempotency_key',
+    'jumlah_bayar',
+    'status',
+    'qris_payload',
+    'expires_at',
+    'payment_time',
+];
 
     protected function casts(): array
     {

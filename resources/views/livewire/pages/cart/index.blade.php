@@ -198,11 +198,34 @@ new #[Layout('layouts.katalog')] class extends Component
                     <p class="text-xs font-medium text-red-700">Perbaiki item bermasalah sebelum melanjutkan.</p>
                 @endif
 
-                {{-- Rute checkout dibuat pada Pertemuan 9; sementara tombol hanya aktif bila keranjang layak pesan. --}}
-                <button type="button" @disabled(! $cart->isOrderable())
-                        class="inline-flex h-11 w-full items-center justify-center rounded-lg bg-hijau text-sm font-semibold text-white hover:bg-hijau-tua disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500">
-                    Lanjut ke Pembayaran
-                </button>
+                {{-- Form Checkout menuju ke PaymentController (Modul 9) --}}
+                @if (! $cart->hasBlockingIssues && ! $cart->isEmpty())
+                    <form action="{{ route('payment.store') }}" method="POST" class="space-y-3 pt-2">
+    @csrf
+    
+    <div class="rounded-lg border border-[#E4DED0] bg-[#FAFAF7] p-3 text-sm">
+        <p class="font-semibold text-gray-700 mb-2">Pilih Metode Pembayaran:</p>
+        <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="payment_method" value="qris" checked class="text-hijau focus:ring-hijau"> QRIS
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+                <input type="radio" name="payment_method" value="bank_transfer" class="text-hijau focus:ring-hijau"> Transfer Bank
+            </label>
+        </div>
+    </div>
+
+    <button type="submit" @disabled(! $cart->isOrderable())
+            class="inline-flex h-11 w-full items-center justify-center rounded-lg bg-hijau text-sm font-semibold text-white hover:bg-hijau-tua disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-500">
+        Lanjut ke Pembayaran
+    </button>
+</form>
+                @else
+                    <button type="button" disabled
+                            class="inline-flex h-11 w-full items-center justify-center rounded-lg bg-stone-300 text-sm font-semibold text-stone-500 cursor-not-allowed">
+                        Lanjut ke Pembayaran
+                    </button>
+                @endif
 
                 <button type="button" wire:click="clear" wire:confirm="Kosongkan seluruh keranjang?" class="w-full text-center text-sm font-medium text-gray-600 underline">
                     Kosongkan keranjang
